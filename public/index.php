@@ -27,4 +27,6 @@ require_once __DIR__ . '/../app/config/dependencies.php';
 
 require_once __DIR__ . '/../app/routes/config.php';
 
+require_once __DIR__ . '/../app/helper/common.php';
+
 $app->run();

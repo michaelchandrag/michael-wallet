@@ -22,6 +22,7 @@ class Delivery {
 		];
 		$this->errors[] = $error;
 		$this->success = false;
+		$this->statusCode = $statusCode;
 	}
 
 	public function hasErrors () {

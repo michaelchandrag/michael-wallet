@@ -10,44 +10,94 @@ class User extends Model implements UserContract {
     use SoftDeletes;
     protected $table = 'user';
 
-    private function getQueryBuilder ($filter) {
-        $query = DB::table($this->table);
-        foreach ($filter as $key => $value) {
-            $query->where($key, '=', $value);
-        }
-        $query->whereNull('deleted_at');
+    private function getQueryBuilder ($filters) {
+        $query = DB::table($this->table.' AS u');
+        $query = $this->addFilters($query, $filters);
         return $query;
     }
 
     private function modifySelectQuery ($query) {
         $query->select(
-            'id',
-            'email',
-            'created_at',
-            'updated_at',
-            'deleted_at'
+            'u.id as id',
+            'u.first_name as first_name',
+            'u.last_name as last_name',
+            'u.email as email',
+            'u.phone_number as phone_number',
+            'u.created_at as created_at',
+            'u.updated_at as updated_at',
+            'u.deleted_at as deleted_at'
         );
         return $query;
     }
 
-    public function find($filter = []) {
-        $query = $this->getQueryBuilder($filter);
-        $query = $this->modifySelectQuery($query);
+    private function addFilters ($query, $filters) {
+        $equalFilter = [
+            'id',
+            'email',
+            'phone_number',
+            'email|phone_number'
+        ];
+
+        $query = $this->addEqualFilter($query, $filters, $equalFilter);
+        $query->whereNull('deleted_at');
+
+        return $query;
+    }
+
+    private function addEqualFilter ($query, $filters, $args) {
+        foreach ($args as $arg) {
+            if ($this->isAvailable($filters, $arg)) {
+                if (strpos($arg, "|") !== false) {
+                    $query->where(function ($queryLevel) use ($filters, $arg) {
+                        $keys = explode("|", $arg);
+                        $values = explode("|", $filters[$arg]);
+                        foreach ($keys as $idx => $value) {
+                            if ($idx == 0) {
+                                $queryLevel->where($keys[$idx], $values[$idx]);
+                            } else {
+                                $queryLevel->orWhere($keys[$idx], $values[$idx]);
+                            }
+                        }
+                    }); 
+                } else {
+                    $query->where($arg, '=', $filters[$arg]);        
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    private function isAvailable ($filters, $key) {
+        if (isset($filters[$key]) && !empty($filters[$key])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function find($filters = [], $plain = false) {
+        $query = $this->getQueryBuilder($filters);
+        if (!$plain) {
+            $query = $this->modifySelectQuery($query);
+        }
         return $query->get();
     }
 
-    public function findOne($filter = []) {
-        $query = $this->getQueryBuilder($filter);
-        $query = $this->modifySelectQuery($query);
+    public function findOne($filters = [], $plain = false) {
+        $query = $this->getQueryBuilder($filters);
+        if (!$plain) {
+            $query = $this->modifySelectQuery($query);
+        }
         return $query->first();
     }
 
     public function create($data) {
-        $newProduct = new Product;
+        $newData = new User;
         foreach ($data as $key => $value) {
-            $newProduct->{$key} = $value;
+            $newData->{$key} = $value;
         }
-        return $newProduct->save();
+        $newData->save();
+        return $newData->id;
     }
 
     public function modify($filter, $data = []) {

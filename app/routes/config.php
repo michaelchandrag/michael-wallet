@@ -1,7 +1,11 @@
 <?php
+
+use Slim\Psr7\Response;
+use Psr\Http\Message\RequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+
 require_once __DIR__.'/api.php';
 require_once __DIR__.'/web.php';
-
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
@@ -20,8 +24,8 @@ $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/api/{routes:.+}', functio
     $data = [
     	"success" => false,
     	"error" => [
-            "status_code" => 400,
-            "message" => "Not found."
+            "status_code" => 404,
+            "message" => "Route Not found."
         ]
     ];
     $payload = json_encode($data);
