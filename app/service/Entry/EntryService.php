@@ -9,40 +9,18 @@ class EntryService {
 
 	private $request;
 	private $delivery;
+	private $entryValidator;
 
 	public function __construct (Request $request, Delivery $delivery) {
 		$this->request = $request;
 		$this->delivery = $delivery;
+		$this->entryValidator = new EntryValidator;
 	}
 
-	public function register (UserContract $userRepository) {
-		$payload = $this->request->getParsedBody();
+	public function register ($data, UserContract $userRepository) {
+		$payload = $data;
 
-		if (!isset($payload['first_name']) || empty($payload['first_name'])) {
-			$this->delivery->addError(400, 'First name should not be empty.');
-		}
-
-		if (!isset($payload['email']) || empty($payload['email'])) {
-			$this->delivery->addError(400, 'Email should not be empty.');
-		}
-
-		if (!isset($payload['phone_number']) || empty($payload['phone_number'])) {
-			$this->delivery->addError(400, 'Phone number should not be empty.');
-		}
-
-		if (empty($payload['password']) || ($payload['password'] != $payload['confirm_password'])) {
-			$this->delivery->addError(400, 'Something error with the password.');
-		}
-
-		if ($this->delivery->hasErrors()) {
-			return $this->delivery;
-		}
-
-		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['email'].'|'.$payload['phone_number']]);
-		if (!empty($existsUser)) {
-			$this->delivery->addError(409, 'Email or phone number already registered.');
-		}
-
+		$this->delivery = $this->entryValidator->validateRegister($this->delivery, $payload, $userRepository);
 		if ($this->delivery->hasErrors()) {
 			return $this->delivery;
 		}
@@ -61,25 +39,21 @@ class EntryService {
 		return $this->delivery;
 	}
 
-	public function login (UserContract $userRepository) {
-		$payload = $this->request->getParsedBody();
+	public function login ($data, UserContract $userRepository) {
+		$payload = $data;
+
+		$this->delivery = $this->entryValidator->validateLogin($this->delivery, $payload, $userRepository);
+		if ($this->delivery->hasErrors())
+			return $this->delivery;
 
 		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['username'].'|'.$payload['username']], true);
-		if (empty($existsUser)) {
-			$this->delivery->addError(400, 'Email or phone number or password is incorrect.');
-			return $this->delivery;
-		}
+		$token = createToken($existsUser);
 
-		if ($existsUser->password != convertToSalt($payload['password'])) {
-			$this->delivery->addError(400, 'Email or phone number or password is incorrect.');
-			return $this->delivery;	
-		}
+		$resp = [
+			'token' => $token
+		];
 
-		if ($this->delivery->hasErrors()) {
-			return $this->delivery;
-		}
-
-		$this->delivery->data = $existsUser;
+		$this->delivery->data = $resp;
 		$this->delivery->success = true;
 		return $this->delivery;
 	}

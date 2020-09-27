@@ -16,14 +16,16 @@ class EntryController extends BaseController {
 	}
 
 	public function RegisterAction (Request $request, Response $response, $args) {
+		$data = $request->getParsedBody();
 		$service = new EntryService($request, $this->delivery);
-		$result = $service->register(new User);
+		$result = $service->register($data, new User);
 		return $this->deliverJSON($response, $result);
 	}
 
 	public function LoginAction (Request $request, Response $response, $args) {
+		$data = $request->getParsedBody();
 		$service = new EntryService($request, $this->delivery);
-		$result = $service->login(new User);
+		$result = $service->login($data, new User);
 		return $this->deliverJSON($response, $result);
 	}
 }

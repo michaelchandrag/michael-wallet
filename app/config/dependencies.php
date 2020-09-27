@@ -11,6 +11,9 @@ $container->set('ApiUserController', function(ContainerInterface $c) {
 $container->set('ApiEntryController', function(ContainerInterface $c) {
 	return new \Controller\Api\EntryController();
 });
+$container->set('ApiMeController', function(ContainerInterface $c) {
+	return new \Controller\Api\MeController();
+});
 
 // Public Controller
 $container->set('WebMainController', function(ContainerInterface $c) {

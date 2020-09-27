@@ -1,5 +1,6 @@
 <?php
 use Slim\Routing\RouteCollectorProxy;
+use Engine\Middleware\BasicMiddleware;
 
 $app->group('/api/v1', function (RouteCollectorProxy $group) {
     
@@ -14,5 +15,9 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
     $group->group('/user', function (RouteCollectorProxy $groupUser) {
     	$groupUser->get('', 'ApiUserController:GetAction');
     });
+
+    $group->group('/me', function (RouteCollectorProxy $groupUser) {
+    	$groupUser->get('', 'ApiMeController:GetAction');
+    })->add(new BasicMiddleware());
 
 });

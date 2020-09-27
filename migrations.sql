@@ -13,4 +13,16 @@ CREATE TABLE `user` (
 	UNIQUE KEY unique_phone_number (`phone_number`)
 ) ENGINE=InnoDB;
 
-insert into `user` (`email`, `password`, `created_at`, `updated_at`) values ('canzinzzzide@yahoo.co.id', 'asd', now(), now());
+/* */
+
+CREATE TABLE `wallet` (
+	`id` 				INT NOT NULL AUTO_INCREMENT,
+	`id_user` 			INT NOT NULL,
+	`name`				VARCHAR(200) NULL DEFAULT '',		
+	`description` 		TEXT NULL,
+	`created_at`		DATETIME NULL,
+	`updated_at`		DATETIME NULL,
+	`deleted_at`	 	DATETIME NULL,
+    PRIMARY KEY (`id`),
+	INDEX (`id_user`) 
+) ENGINE=InnoDB;

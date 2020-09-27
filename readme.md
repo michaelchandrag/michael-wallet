@@ -11,8 +11,10 @@ composer install
 Create .env file at the root project directory
 
 ```
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=jmr14012020
-DB_NAME=michael_wallet
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_NAME=
+
+JWT_KEY
 ```
