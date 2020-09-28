@@ -15,8 +15,9 @@ class MeService {
 		$this->delivery = $delivery;
 	}
 
-	public function getMe (UserContract $userRepository) {
-		$this->delivery->data = 'ok';
+	public function getMe ($user, UserContract $userRepository) {
+		$me = $userRepository->findOne(['id' => $user->id]);
+		$this->delivery->data = $me;
 		return $this->delivery;
 	}
 }

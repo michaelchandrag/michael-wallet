@@ -1,7 +1,7 @@
 <?php
-
 namespace Controller;
 
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\PhpRenderer;
 use Engine\Internal\Delivery;
@@ -11,6 +11,12 @@ class BaseController {
 
 	public function __construct () {
 
+	}
+
+	public function getUser (Request $request) {
+		$token = $request->getHeader('Authorization');
+		$explode = explode("Bearer ", $token[0]);
+		return getJWTPayload($explode[1], 'user');
 	}
 
 	public function deliverJSON ($response, Delivery $delivery) {

@@ -35,12 +35,27 @@ function getBaseUrl () {
  * @return string
  */
 function createToken ($user) {
-	$key = getenv("JWT_KEY");
+	$secretKey = getenv("JWT_KEY");
 	$payload = array(
 		"iss" => getBaseUrl(),
 		"user" => $user
 	);
 
-	$jwt = JWT::encode($payload, $key);
+	$jwt = JWT::encode($payload, $secretKey);
 	return $jwt;
+}
+
+/**
+ * Get payload from JWT Token
+ *
+ * @
+ * 
+ */
+function getJWTPayload ($token, $key = null) {
+	$secretKey = getenv("JWT_KEY");
+	$decoded = JWT::decode($token, $secretKey, array('HS256'));
+	if (!empty($key)) {
+		return $decoded->{$key};
+	}
+	return $decoded;
 }

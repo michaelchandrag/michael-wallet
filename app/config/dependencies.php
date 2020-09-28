@@ -5,14 +5,21 @@ use Psr\Container\ContainerInterface as ContainerInterface;
 $container->set('ApiHelloController', function(ContainerInterface $c) {
 	return new \Controller\Api\HelloController();
 });
+
 $container->set('ApiUserController', function(ContainerInterface $c) {
 	return new \Controller\Api\UserController();
 });
+
 $container->set('ApiEntryController', function(ContainerInterface $c) {
 	return new \Controller\Api\EntryController();
 });
+
 $container->set('ApiMeController', function(ContainerInterface $c) {
-	return new \Controller\Api\MeController();
+	return new \Controller\Api\Me\MeController();
+});
+
+$container->set('ApiMeWalletController', function(ContainerInterface $c) {
+	return new \Controller\Api\Me\MeWalletController();
 });
 
 // Public Controller

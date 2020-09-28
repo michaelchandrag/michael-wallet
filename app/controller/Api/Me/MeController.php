@@ -1,5 +1,5 @@
 <?php
-namespace Controller\Api;
+namespace Controller\Api\Me;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -16,8 +16,9 @@ class MeController extends BaseController {
 	}
 
 	public function GetAction (Request $request, Response $response, $args) {
+		$user = $this->getUser($request);
 		$service = new MeService($request, $this->delivery);
-		$result = $service->getMe(new User);
+		$result = $service->getWallet($user, new User);
 		return $this->deliverJSON($response, $result);
 	}
 	

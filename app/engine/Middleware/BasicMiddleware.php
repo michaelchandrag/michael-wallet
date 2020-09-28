@@ -19,22 +19,17 @@ class BasicMiddleware
      */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
-    	/* $authorization = $request->getHeader('Authorization');
+    	$authorization = $request->getHeader('Authorization');
     	if (empty($authorization)) {
     		$delivery = new Delivery;
-    		$delivery->addError(400, 'Authorization token not found');
-
-    		$baseController = new BaseController;
+    		$delivery->addError(403, 'Authorization token not found');
+            $delivery->statusCode = 403;
+            $response = new \Slim\Psr7\Response();
+            $baseController = new BaseController;
     		return $baseController->deliverJSON($response, $delivery);
     	} else {
     		$response = $handler->handle($request);
 	        return $response;	
-    	} */
-    	$response = $handler->handle($request);
-        $existingContent = (string) $response->getBody();
-    
-        $response->getBody()->write('BEFORE' . $existingContent);
-    
-        return $response;
+    	}
     }
 }
