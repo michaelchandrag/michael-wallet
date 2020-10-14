@@ -27,10 +27,9 @@ class EntryService {
 
 		$data = [
 			'email' => $payload['email'],
-			'phone_number' => $payload['phone_number'],
+			// 'phone_number' => $payload['phone_number'],
 			'password' => convertToSalt($payload['password']),
-			'first_name' => $payload['first_name'],
-			'last_name' => $payload['last_name']
+			'name' => $payload['name']
 		];
 		$newUserId = $userRepository->create($data);
 		$newUser = $userRepository->findOne(['id' => $newUserId]);

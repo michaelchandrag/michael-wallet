@@ -3,8 +3,7 @@ CREATE TABLE `user` (
 	`email`					VARCHAR(200) NOT NULL,
 	`phone_number` 			VARCHAR(200) NOT NULL,
 	`password`				VARCHAR(200) NOT NULL,
-	`first_name`			VARCHAR(200) NULL,
-	`last_name`				VARCHAR(200) NULL,
+	`name`					VARCHAR(200) NULL,
 	`created_at`			DATETIME NULL,
 	`updated_at` 			DATETIME NULL,
 	`deleted_at`			DATETIME NULL,
@@ -26,3 +25,51 @@ CREATE TABLE `wallet` (
     PRIMARY KEY (`id`),
 	INDEX (`id_user`) 
 ) ENGINE=InnoDB;
+
+
+/* */
+
+CREATE TABLE `category` (
+	`id` 					INT NOT NULL AUTO_INCREMENT,
+	`id_user` 				INT NOT NULL,
+	`type` 					VARCHAR(200) NOT NULL, /* cash_in / cash_out */
+	`name` 					VARCHAR(200) NULL DEFAULT '',
+	`description` 			TEXT NULL,
+	`created_at`			DATETIME NULL,
+	`updated_at`			DATETIME NULL,
+	`deleted_at`			DATETIME NULL,
+    PRIMARY KEY (`id`),
+    INDEX (`id_user`),
+    INDEX (`type`)
+) ENGINE=InnoDB;
+
+/* */
+
+CREATE TABLE `transaction` (
+	`id` 					INT NOT NULL AUTO_INCREMENT,
+	`id_user` 				INT NOT NULL,
+    `id_category` 			INT NOT NULL,
+    `id_wallet` 			INT NOT NULL,
+    `amount` 				INT DEFAULT 0 NOT NULL,
+	`description` 			TEXT NULL,
+	`created_at`			DATETIME NULL,
+	`updated_at`			DATETIME NULL,
+	`deleted_at`			DATETIME NULL,
+    PRIMARY KEY (`id`),
+    INDEX (`id_user`),
+    INDEX (`id_category`),
+    INDEX (`id_wallet`)
+) ENGINE=InnoDB;
+
+
+ALTER TABLE `wallet` ADD lifetime_cash_in_total INT DEFAULT 0;
+ALTER TABLE `wallet` ADD lifetime_cash_out_total INT DEFAULT 0;
+ALTER TABLE `wallet` ADD lifetime_total INT DEFAULT 0;
+
+ALTER TABLE `category` ADD lifetime_cash_in_total INT DEFAULT 0;
+ALTER TABLE `category` ADD lifetime_cash_out_total INT DEFAULT 0;
+ALTER TABLE `category` ADD lifetime_total INT DEFAULT 0;
+
+ALTER TABLE `user` ADD lifetime_cash_in_total INT DEFAULT 0;
+ALTER TABLE `user` ADD lifetime_cash_out_total INT DEFAULT 0;
+ALTER TABLE `user` ADD lifetime_total INT DEFAULT 0;

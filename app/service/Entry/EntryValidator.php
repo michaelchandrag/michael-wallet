@@ -11,17 +11,17 @@ class EntryValidator {
 	}
 
 	public function validateRegister (Delivery $delivery, $payload, UserContract $userRepository) {
-		if (!isset($payload['first_name']) || empty($payload['first_name'])) {
-			$delivery->addError(400, 'First name should not be empty.');
+		if (!isset($payload['name']) || empty($payload['name'])) {
+			$delivery->addError(400, 'Name should not be empty.');
 		}
 
 		if (!isset($payload['email']) || empty($payload['email'])) {
 			$delivery->addError(400, 'Email should not be empty.');
 		}
 
-		if (!isset($payload['phone_number']) || empty($payload['phone_number'])) {
+		/* if (!isset($payload['phone_number']) || empty($payload['phone_number'])) {
 			$delivery->addError(400, 'Phone number should not be empty.');
-		}
+		} */
 
 		if (empty($payload['password']) || ($payload['password'] != $payload['confirm_password'])) {
 			$delivery->addError(400, 'Something error with the password.');
@@ -31,7 +31,7 @@ class EntryValidator {
 			return $delivery;
 		}
 
-		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['email'].'|'.$payload['phone_number']]);
+		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['email'].'|'.$payload['email']]);
 		if (!empty($existsUser)) {
 			$delivery->addError(409, 'Email or phone number already registered.');
 		}

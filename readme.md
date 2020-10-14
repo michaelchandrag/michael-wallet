@@ -16,5 +16,5 @@ DB_USER=
 DB_PASS=
 DB_NAME=
 
-JWT_KEY
+JWT_KEY=
 ```

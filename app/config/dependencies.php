@@ -22,6 +22,14 @@ $container->set('ApiMeWalletController', function(ContainerInterface $c) {
 	return new \Controller\Api\Me\MeWalletController();
 });
 
+$container->set('ApiMeCategoryController', function(ContainerInterface $c) {
+	return new \Controller\Api\Me\MeCategoryController();
+});
+
+$container->set('ApiMeTransactionController', function(ContainerInterface $c) {
+	return new \Controller\Api\Me\MeTransactionController();
+});
+
 // Public Controller
 $container->set('WebMainController', function(ContainerInterface $c) {
 	return new \Controller\Web\MainController();

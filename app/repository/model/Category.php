@@ -4,30 +4,33 @@ namespace Repository\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
-use Repository\Contract\UserContract;
+use Repository\Contract\CategoryContract;
 
-class User extends Model implements UserContract {
+class Category extends Model implements CategoryContract {
     use SoftDeletes;
-    protected $table = 'user';
+
+    const TYPE_CASH_IN = 'cash_in';
+    const TYPE_CASH_OUT = 'cash_out';
+
+    protected $table = 'category';
 
     private function getQueryBuilder ($filters) {
-        $query = DB::table($this->table.' AS u');
+        $query = DB::table($this->table.' AS c');
         $query = $this->addFilters($query, $filters);
         return $query;
     }
 
     private function modifySelectQuery ($query) {
         $query->select(
-            'u.id as id',
-            'u.name as name',
-            'u.email as email',
-            'u.phone_number as phone_number',
-            'u.lifetime_cash_in_total as lifetime_cash_in_total',
-            'u.lifetime_cash_out_total as lifetime_cash_out_total',
-            'u.lifetime_total as lifetime_total',
-            'u.created_at as created_at',
-            'u.updated_at as updated_at',
-            'u.deleted_at as deleted_at'
+            'c.id as id',
+            'c.name as name',
+            'c.type as type',
+            'c.lifetime_cash_in_total as lifetime_cash_in_total',
+            'c.lifetime_cash_out_total as lifetime_cash_out_total',
+            'c.lifetime_total as lifetime_total',
+            'c.description as description',
+            'c.created_at as created_at',
+            'c.updated_at as updated_at'
         );
         return $query;
     }
@@ -35,9 +38,8 @@ class User extends Model implements UserContract {
     private function addFilters ($query, $filters) {
         $equalFilter = [
             'id',
-            'email',
-            'phone_number',
-            'email|phone_number'
+            'id_user',
+            'name'
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
@@ -94,7 +96,7 @@ class User extends Model implements UserContract {
     }
 
     public function create($data) {
-        $newData = new User;
+        $newData = new Category;
         foreach ($data as $key => $value) {
             $newData->{$key} = $value;
         }

@@ -4,44 +4,43 @@ namespace Repository\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
-use Repository\Contract\UserContract;
+use Repository\Contract\TransactionContract;
 
-class User extends Model implements UserContract {
+class Transaction extends Model implements TransactionContract {
     use SoftDeletes;
-    protected $table = 'user';
+
+    protected $table = 'transaction';
 
     private function getQueryBuilder ($filters) {
-        $query = DB::table($this->table.' AS u');
+        $query = DB::table($this->table.' AS t');
         $query = $this->addFilters($query, $filters);
         return $query;
     }
 
     private function modifySelectQuery ($query) {
         $query->select(
-            'u.id as id',
-            'u.name as name',
-            'u.email as email',
-            'u.phone_number as phone_number',
-            'u.lifetime_cash_in_total as lifetime_cash_in_total',
-            'u.lifetime_cash_out_total as lifetime_cash_out_total',
-            'u.lifetime_total as lifetime_total',
-            'u.created_at as created_at',
-            'u.updated_at as updated_at',
-            'u.deleted_at as deleted_at'
+            't.id as id',
+            't.id_user as id_user',
+            't.id_category as id_category',
+            't.id_wallet as id_wallet',
+            't.amount as amount',
+            't.description as description',
+            't.created_at as created_at',
+            't.updated_at as updated_at'
         );
         return $query;
     }
 
     private function addFilters ($query, $filters) {
         $equalFilter = [
-            'id',
-            'email',
-            'phone_number',
-            'email|phone_number'
+            't.id',
+            't.id_user',
+            't.id_wallet',
+            't.id_category'
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
-        $query->whereNull('deleted_at');
+        $query->whereNull('t.deleted_at');
 
         return $query;
     }
@@ -90,11 +89,19 @@ class User extends Model implements UserContract {
         if (!$plain) {
             $query = $this->modifySelectQuery($query);
         }
-        return $query->first();
+        $result = $query->first();
+        if (!empty($result)) {
+            $wallet = new Wallet;
+            $result->wallet = $wallet->findOne(['id' => $result->id_wallet]); 
+
+            $category = new Category;
+            $result->category = $category->findOne(['id' => $result->id_category]);
+        }
+        return $result;
     }
 
     public function create($data) {
-        $newData = new User;
+        $newData = new Transaction;
         foreach ($data as $key => $value) {
             $newData->{$key} = $value;
         }
@@ -105,5 +112,23 @@ class User extends Model implements UserContract {
     public function modify($filter, $data = []) {
         $query = $this->getQueryBuilder($filter);
         return $query->update($data);
+    }
+
+    public function fetchByCategoryType ($filters = []) {
+        $query = DB::table($this->table.' as t');
+        $query->select(
+            'c.type as type',
+            DB::raw('SUM(t.amount) as total')
+        );
+        $query->join('wallet as w', 'w.id', '=', 't.id_wallet');
+        $query->join('category as c', 'c.id', '=', 't.id_category');
+        $query->join('user as u', 'u.id', '=', 't.id_user');
+        $query = $this->addFilters($query, $filters);
+        $query->groupBy('c.type');
+        $result = [];
+        foreach ($query->get() as $data) {
+            $result[$data->type] = $data->total;
+        }
+        return $result;
     }
 }

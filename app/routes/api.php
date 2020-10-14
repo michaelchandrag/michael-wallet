@@ -29,20 +29,20 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
         });
 
         // category
-        /* $groupMe->group('/category', function (RouteCollectorProxy $groupCategory) {
+        $groupMe->group('/category', function (RouteCollectorProxy $groupCategory) {
             $groupCategory->get('', 'ApiMeCategoryController:GetCategoryAction');
             $groupCategory->post('', 'ApiMeCategoryController:CreateCategoryAction');
             $groupCategory->post('/{category_id}', 'ApiMeCategoryController:UpdateCategoryAction');
             $groupCategory->post('/delete/{category_id}', 'ApiMeCategoryController:DeleteCategoryAction');
-        }) */
+        });
 
         // transaction
-        /* $groupMe->group('/transaction', function (RouteCollectorProxy $groupTransaction) {
+        $groupMe->group('/transaction', function (RouteCollectorProxy $groupTransaction) {
             $groupTransaction->get('', 'ApiMeTransactionController:GetTransactionAction');
             $groupTransaction->post('', 'ApiMeTransactionController:CreateTransactionAction');
             $groupTransaction->post('/{transaction_id}', 'ApiMeTransactionController:UpdateTransactionAction');
             $groupTransaction->post('/delete/{transaction_id}', 'ApiMeTransactionController:DeleteTransactionAction');
-        }); */
+        });
 
 
     })->add(new BasicMiddleware());

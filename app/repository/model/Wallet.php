@@ -20,6 +20,9 @@ class Wallet extends Model implements WalletContract {
         $query->select(
             'w.id as id',
             'w.name as name',
+            'w.lifetime_cash_in_total as lifetime_cash_in_total',
+            'w.lifetime_cash_out_total as lifetime_cash_out_total',
+            'w.lifetime_total as lifetime_total',
             'w.description as description',
             'w.created_at as created_at',
             'w.updated_at as updated_at'
@@ -30,9 +33,8 @@ class Wallet extends Model implements WalletContract {
     private function addFilters ($query, $filters) {
         $equalFilter = [
             'id',
-            'email',
-            'phone_number',
-            'email|phone_number'
+            'id_user',
+            'name'
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);

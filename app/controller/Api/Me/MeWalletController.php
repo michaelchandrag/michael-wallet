@@ -32,7 +32,7 @@ class MeWalletController extends BaseController {
 			'id_user' => $user->id
 		];
 		$service = new MeWalletService($request, $this->delivery);
-		$result = $service->createWallet($data, new Wallet, new User);
+		$result = $service->createWallet($data, $user, new Wallet, new User);
 		return $this->deliverJSON($response, $result);
 	}
 

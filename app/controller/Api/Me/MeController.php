@@ -8,6 +8,7 @@ use Engine\Internal\Delivery;
 use Service\Me\MeService;
 
 use Repository\Model\User;
+use Repository\Model\Wallet;
 
 class MeController extends BaseController {
 
@@ -18,7 +19,7 @@ class MeController extends BaseController {
 	public function GetAction (Request $request, Response $response, $args) {
 		$user = $this->getUser($request);
 		$service = new MeService($request, $this->delivery);
-		$result = $service->getWallet($user, new User);
+		$result = $service->getMe($user, new User, new Wallet);
 		return $this->deliverJSON($response, $result);
 	}
 	
