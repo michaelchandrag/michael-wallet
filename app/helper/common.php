@@ -52,10 +52,14 @@ function createToken ($user) {
  * 
  */
 function getJWTPayload ($token, $key = null) {
-	$secretKey = getenv("JWT_KEY");
-	$decoded = JWT::decode($token, $secretKey, array('HS256'));
-	if (!empty($key)) {
-		return $decoded->{$key};
+	try {
+		$secretKey = getenv("JWT_KEY");
+		$decoded = JWT::decode($token, $secretKey, array('HS256'));
+		if (!empty($key)) {
+			return $decoded->{$key};
+		}
+		return $decoded;
+	} catch (\Exception $e) {
+		return false;
 	}
-	return $decoded;
 }
