@@ -1,7 +1,7 @@
 CREATE TABLE `user` (
 	`id` 					INT NOT NULL AUTO_INCREMENT,
 	`email`					VARCHAR(200) NOT NULL,
-	`phone_number` 			VARCHAR(200) NOT NULL,
+	`phone_number` 			VARCHAR(200) NULL,
 	`password`				VARCHAR(200) NOT NULL,
 	`name`					VARCHAR(200) NULL,
 	`created_at`			DATETIME NULL,
