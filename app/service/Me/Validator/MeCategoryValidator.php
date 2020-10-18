@@ -13,11 +13,11 @@ class MeCategoryValidator {
 	}
 
 	public function validateCreateCategory (Delivery $delivery, $payload, UserContract $userRepository) {
-		if (!isset($payload['name'])) {
+		if (!isset($payload['name']) || empty($payload['name'])) {
 			$delivery->addError(400, 'Category name should not be empty.');
 		}
 
-		if (!isset($payload['type'])) {
+		if (!isset($payload['type']) || empty($payload['type'])) {
 			$delivery->addError(400, 'Category type should not be empty.');
 		}
 

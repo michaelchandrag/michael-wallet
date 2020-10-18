@@ -12,7 +12,7 @@ class MeWalletValidator {
 	}
 
 	public function validateCreateWallet (Delivery $delivery, $payload, UserContract $userRepository) {
-		if (!isset($payload['name']) || empty($payload['description'])) {
+		if (!isset($payload['name']) || empty($payload['name'])) {
 			$delivery->addError(400, 'Wallet name should not be empty.');
 		}
 
