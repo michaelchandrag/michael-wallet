@@ -22,7 +22,9 @@ class MeTransactionService {
 	}
 
 	public function getTransaction ($user, TransactionContract $transactionRepository) {
-		$transaction = $transactionRepository->find(['id_user' => $user->id]);
+		$filters = $this->request->getQueryParams();
+		$filters['id_user'] => $user->id;
+		$transaction = $transactionRepository->find($filters);
 		$this->delivery->data = $transaction;
 		return $this->delivery;
 	}

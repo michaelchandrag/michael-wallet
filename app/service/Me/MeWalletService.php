@@ -21,7 +21,9 @@ class MeWalletService {
 	}
 
 	public function getWallet ($user, WalletContract $walletRepository) {
-		$wallet = $walletRepository->find(['id_user' => $user->id]);
+		$filters = $this->request->getQueryParams();
+		$filters['id_user'] = $user->id;
+		$wallet = $walletRepository->find($filters);
 		$this->delivery->data = $wallet;
 		return $this->delivery;
 	}

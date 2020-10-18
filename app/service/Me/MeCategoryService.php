@@ -21,7 +21,9 @@ class MeCategoryService {
 	}
 
 	public function getCategory ($user, CategoryContract $categoryRepository) {
-		$category = $categoryRepository->find(['id_user' => $user->id]);
+		$filters = $this->request->getQueryParams();
+		$filters['id_user'] = $user->id;
+		$category = $categoryRepository->find($filters);
 		$this->delivery->data = $category;
 		return $this->delivery;
 	}

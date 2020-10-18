@@ -6,98 +6,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Repository\Contract\TransactionContract;
 
-class Transaction extends Model implements TransactionContract {
+class Transaction extends BaseModel implements TransactionContract {
     use SoftDeletes;
 
     protected $table = 'transaction';
 
-    private function getQueryBuilder ($filters) {
-        $query = DB::table($this->table.' AS t');
-        $query = $this->addFilters($query, $filters);
-        return $query;
-    }
-
-    private function modifySelectQuery ($query) {
+    protected function modifySelectQuery ($query) {
         $query->select(
-            't.id as id',
-            't.id_user as id_user',
-            't.id_category as id_category',
-            't.id_wallet as id_wallet',
-            't.amount as amount',
-            't.description as description',
-            't.created_at as created_at',
-            't.updated_at as updated_at'
+            'transaction.id as id',
+            'transaction.id_user as id_user',
+            'transaction.id_category as id_category',
+            'transaction.id_wallet as id_wallet',
+            'transaction.amount as amount',
+            'transaction.description as description',
+            'transaction.created_at as created_at',
+            'transaction.updated_at as updated_at'
         );
         return $query;
     }
 
-    private function addFilters ($query, $filters) {
+    protected function addFilters ($query, $filters) {
         $equalFilter = [
-            't.id',
-            't.id_user',
-            't.id_wallet',
-            't.id_category'
+            'transaction.id',
+            'transaction.id_user',
+            'transaction.id_wallet',
+            'transaction.id_category'
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
-        $query->whereNull('t.deleted_at');
+        $query->whereNull('transaction.deleted_at');
 
         return $query;
-    }
-
-    private function addEqualFilter ($query, $filters, $args) {
-        foreach ($args as $arg) {
-            if ($this->isAvailable($filters, $arg)) {
-                if (strpos($arg, "|") !== false) {
-                    $query->where(function ($queryLevel) use ($filters, $arg) {
-                        $keys = explode("|", $arg);
-                        $values = explode("|", $filters[$arg]);
-                        foreach ($keys as $idx => $value) {
-                            if ($idx == 0) {
-                                $queryLevel->where($keys[$idx], $values[$idx]);
-                            } else {
-                                $queryLevel->orWhere($keys[$idx], $values[$idx]);
-                            }
-                        }
-                    }); 
-                } else {
-                    $query->where($arg, '=', $filters[$arg]);        
-                }
-            }
-        }
-
-        return $query;
-    }
-
-    private function isAvailable ($filters, $key) {
-        if (isset($filters[$key]) && !empty($filters[$key])) {
-            return true;
-        }
-        return false;
-    }
-
-    public function find($filters = [], $plain = false) {
-        $query = $this->getQueryBuilder($filters);
-        if (!$plain) {
-            $query = $this->modifySelectQuery($query);
-        }
-        return $query->get();
-    }
-
-    public function findOne($filters = [], $plain = false) {
-        $query = $this->getQueryBuilder($filters);
-        if (!$plain) {
-            $query = $this->modifySelectQuery($query);
-        }
-        $result = $query->first();
-        if (!empty($result)) {
-            $wallet = new Wallet;
-            $result->wallet = $wallet->findOne(['id' => $result->id_wallet]); 
-
-            $category = new Category;
-            $result->category = $category->findOne(['id' => $result->id_category]);
-        }
-        return $result;
     }
 
     public function create($data) {
@@ -107,11 +46,6 @@ class Transaction extends Model implements TransactionContract {
         }
         $newData->save();
         return $newData->id;
-    }
-
-    public function modify($filter, $data = []) {
-        $query = $this->getQueryBuilder($filter);
-        return $query->update($data);
     }
 
     public function fetchByCategoryType ($filters = []) {
