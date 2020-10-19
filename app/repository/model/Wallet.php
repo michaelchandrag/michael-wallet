@@ -34,8 +34,12 @@ class Wallet extends BaseModel implements WalletContract {
             'id_user',
             'name'
         ];
+        $likeFilter = [
+            'q' => ['name']
+        ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
+        $query = $this->addLikeFilter($query, $filters, $likeFilter);
         $query->whereNull('deleted_at');
 
         return $query;

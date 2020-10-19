@@ -45,7 +45,7 @@ class EntryService {
 		if ($this->delivery->hasErrors())
 			return $this->delivery;
 
-		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['username'].'|'.$payload['username']], true);
+		$existsUser = $userRepository->findOne(['username' => $payload['username']], true);
 		$token = createToken($existsUser);
 
 		$resp = [

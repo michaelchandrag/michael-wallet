@@ -17,10 +17,12 @@ class MeService {
 		$this->delivery = $delivery;
 	}
 
-	public function getMe ($user, UserContract $userRepository, WalletContract $walletRepository) {
+	public function getMe ($user, UserContract $userRepository, WalletContract $walletRepository, TransactionContract $transactionRepository) {
 		$me = $userRepository->findOne(['id' => $user->id]);
-		$wallet = $walletRepository->find(['id_user' => $user->id]);
-		$me->wallets = $wallet;
+		$wallets = $walletRepository->find(['id_user' => $user->id]);
+		$transactions = $transactionRepository->find(['id_user' => $user->id]);
+		$me->wallets = $wallets;
+		$me->transactions = $transactions;
 		$this->delivery->data = $me;
 		return $this->delivery;
 	}

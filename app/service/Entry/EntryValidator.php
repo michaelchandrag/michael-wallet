@@ -31,7 +31,7 @@ class EntryValidator {
 			return $delivery;
 		}
 
-		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['email'].'|'.$payload['email']]);
+		$existsUser = $userRepository->findOne(['username' => $payload['email']]);
 		if (!empty($existsUser)) {
 			$delivery->addError(409, 'Email or phone number already registered.');
 		}
@@ -44,7 +44,7 @@ class EntryValidator {
 	}
 
 	public function validateLogin (Delivery $delivery, $payload, UserContract $userRepository) {
-		$existsUser = $userRepository->findOne(['email|phone_number' => $payload['username'].'|'.$payload['username']], true);
+		$existsUser = $userRepository->findOne(['username' => $payload['username']], true);
 		if (empty($existsUser)) {
 			$delivery->addError(400, 'Email or phone number or password is incorrect.');
 			return $delivery;

@@ -16,7 +16,10 @@ class Transaction extends BaseModel implements TransactionContract {
             'transaction.id as id',
             'transaction.id_user as id_user',
             'transaction.id_category as id_category',
+            'category.name as category_name',
+            'category.type as category_type',
             'transaction.id_wallet as id_wallet',
+            'wallet.name as wallet_name',
             'transaction.amount as amount',
             'transaction.description as description',
             'transaction.created_at as created_at',
@@ -26,6 +29,9 @@ class Transaction extends BaseModel implements TransactionContract {
     }
 
     protected function addFilters ($query, $filters) {
+        $query->join('wallet', 'wallet.id', '=', 'transaction.id_wallet');
+        $query->join('category', 'category.id', '=', 'transaction.id_category');
+
         $equalFilter = [
             'transaction.id',
             'transaction.id_user',
@@ -49,16 +55,16 @@ class Transaction extends BaseModel implements TransactionContract {
     }
 
     public function fetchByCategoryType ($filters = []) {
-        $query = DB::table($this->table.' as t');
+        $query = DB::table($this->table);
         $query->select(
-            'c.type as type',
-            DB::raw('SUM(t.amount) as total')
+            'category.type as type',
+            DB::raw('SUM(transaction.amount) as total')
         );
-        $query->join('wallet as w', 'w.id', '=', 't.id_wallet');
-        $query->join('category as c', 'c.id', '=', 't.id_category');
-        $query->join('user as u', 'u.id', '=', 't.id_user');
+        $query->join('wallet', 'wallet.id', '=', 'transaction.id_wallet');
+        $query->join('category', 'category.id', '=', 'transaction.id_category');
+        $query->join('user', 'user.id', '=', 'transaction.id_user');
         $query = $this->addFilters($query, $filters);
-        $query->groupBy('c.type');
+        $query->groupBy('category.type');
         $result = [];
         foreach ($query->get() as $data) {
             $result[$data->type] = $data->total;

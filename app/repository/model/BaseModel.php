@@ -27,6 +27,7 @@ abstract class BaseModel extends Model {
             $page = (int)$filters['page'];
             $offset = $page*$limit;
         }
+        $query = $this->addSort($query, $filters);
         $query->limit($limit);
         $query->offset($offset);
         $totalPage = ceil($totalData/$limit);
@@ -46,26 +47,61 @@ abstract class BaseModel extends Model {
     }
 
     protected function addEqualFilter ($query, $filters, $args) {
-        foreach ($args as $arg) {
-            if ($this->isAvailable($filters, $arg)) {
-                if (strpos($arg, "|") !== false) {
-                    $query->where(function ($queryLevel) use ($filters, $arg) {
-                        $keys = explode("|", $arg);
-                        $values = explode("|", $filters[$arg]);
-                        foreach ($keys as $idx => $value) {
+        foreach ($args as $argKey => $argValue) {
+            if ($this->isAvailable($filters, $argKey)) {
+                if (is_array($argValue)) {
+                    $query->where(function ($queryLevel) use ($filters, $argKey, $argValue) {
+                        foreach ($argValue as $idx => $value) {
                             if ($idx == 0) {
-                                $queryLevel->where($keys[$idx], $values[$idx]);
+                                $queryLevel->where($value, '=', $filters[$argKey]);
                             } else {
-                                $queryLevel->orWhere($keys[$idx], $values[$idx]);
+                                $queryLevel->orWhere($value, '=', $filters[$argKey]);
                             }
                         }
-                    }); 
+                    });
                 } else {
-                    $query->where($arg, '=', $filters[$arg]);        
+                    $query->where($argValue, '=', $filters[$argKey]);
                 }
             }
         }
 
+        return $query;
+    }
+
+    protected function addLikeFilter ($query, $filters, $args) {
+        foreach ($args as $argKey => $argValue) {
+            if ($this->isAvailable($filters, $argKey)) {
+                if (is_array($argValue)) {
+                    $query->where(function ($queryLevel) use ($filters, $argKey, $argValue) {
+                        foreach ($argValue as $idx => $value) {
+                            if ($idx == 0) {
+                                $queryLevel->where($value, 'like', '%'.$filters[$argKey].'%');
+                            } else {
+                                $queryLevel->orWhere($value, 'like', '%'.$filters[$argKey].'%');
+                            }
+                        }
+                    });
+                } else {
+                    $query->where($argValue, 'like', '%'.$filters[$argKey].'%');
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    protected function addSort ($query, $filters) {
+        // sort_key , sort_value
+        $sortKey = 'created_at';
+        $sortValue = 'desc';
+        if ($this->isAvailable($filters, 'sort_key')) {
+            $sortKey = $filters['sort_key'];
+        }
+        if ($this->isAvailable($filters, 'sort_value')) {
+            $sortValue = $filters['sort_value'];
+        }
+
+        $query->orderBy($this->table.'.'.$sortKey, $sortValue);
         return $query;
     }
 

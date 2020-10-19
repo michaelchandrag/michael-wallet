@@ -9,6 +9,7 @@ use Service\Me\MeService;
 
 use Repository\Model\User;
 use Repository\Model\Wallet;
+use Repository\Model\Transaction;
 
 class MeController extends BaseController {
 
@@ -19,7 +20,7 @@ class MeController extends BaseController {
 	public function GetAction (Request $request, Response $response, $args) {
 		$user = $this->getUser($request);
 		$service = new MeService($request, $this->delivery);
-		$result = $service->getMe($user, new User, new Wallet);
+		$result = $service->getMe($user, new User, new Wallet, new Transaction);
 		return $this->deliverJSON($response, $result);
 	}
 	

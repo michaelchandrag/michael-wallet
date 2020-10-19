@@ -35,8 +35,12 @@ class Category extends BaseModel implements CategoryContract {
             'id_user',
             'name'
         ];
-
+        $likeFilter = [
+            'name'
+        ];
+        
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
+        $query = $this->addLikeFilter($query, $filters, $likeFilter);
         $query->whereNull('deleted_at');
 
         return $query;
