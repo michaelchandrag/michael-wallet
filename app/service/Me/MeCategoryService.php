@@ -45,7 +45,6 @@ class MeCategoryService {
 			
 			DB::commit();
 		} catch (\Exception $e) {
-			dump($e->getMessage());
 			$this->delivery->addError(500, 'Internal Server Error');
 			DB::rollBack();
 		}
@@ -80,18 +79,21 @@ class MeCategoryService {
 		return $this->delivery;
 	}
 
-	public function updateReport ($user, $categoryId, UserContract $userRepository, CategoryContract $categoryRepository, TransactionContract $transactionRepository) {
+	public function updateReport ($user, $idCategory, UserContract $userRepository, CategoryContract $categoryRepository, TransactionContract $transactionRepository) {
 		$payload = [
 			'lifetime_cash_in_total' => 0,
 			'lifetime_cash_out_total' => 0,
-			'lifetime_total' => 0
+			'lifetime_total' => 0,
+			'monthly_cash_in_total' => 0,
+			'monthly_cash_out_total' => 0,
+			'monthly_total' => 0
 		];
 		
-		$filters = [
-			'id_category' => $categoryId,
+		$lifetimeFilters = [
+			'id_category' => $idCategory,
 			'id_user' => $user->id
 		];
-		$lifetimeReport = $transactionRepository->fetchByCategoryType($filters);
+		$lifetimeReport = $transactionRepository->fetchByCategoryType($lifetimeFilters);
 		if (isset($lifetimeReport['cash_in'])) {
 			$payload['lifetime_cash_in_total'] = $lifetimeReport['cash_in'];
 		}
@@ -99,8 +101,24 @@ class MeCategoryService {
 			$payload['lifetime_cash_out_total'] = $lifetimeReport['cash_out'];
 		}
 
+		$monthlyFilters = [
+			'id_category' => $idCategory,
+			'id_user' => $user->id,
+			'from_transaction_at' => date('Y-m-01 00:00:00'),
+			'until_transaction_at' => date('Y-m-t 23:59:59')
+		];
+
+		$monthlyReport = $transactionRepository->fetchByCategoryType($monthlyFilters);
+		if (isset($monthlyReport['cash_in'])) {
+			$payload['monthly_cash_in_total'] = $monthlyReport['cash_in'];
+		}
+		if (isset($monthlyReport['cash_out'])) {
+			$payload['monthly_cash_out_total'] = $monthlyReport['cash_out'];
+		}
+
 		$payload['lifetime_total'] = $payload['lifetime_cash_in_total'] - $payload['lifetime_cash_out_total'];
-		$this->updateCategory($categoryId, $user, $payload, $categoryRepository, $userRepository);
+		$payload['monthly_total'] = $payload['monthly_cash_in_total'] - $payload['monthly_cash_out_total'];
+		$this->updateCategory($idCategory, $user, $payload, $categoryRepository, $userRepository);
 		return true;
 	}
 }

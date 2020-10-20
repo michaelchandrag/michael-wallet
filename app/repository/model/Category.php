@@ -21,7 +21,7 @@ class Category extends BaseModel implements CategoryContract {
             'category.type as type',
             'category.monthly_cash_in_total as monthly_cash_in_total',
             'category.monthly_cash_out_total as monthly_cash_out_total',
-            'category.monthly_cash_total as monthly_cash_total',
+            'category.monthly_total as monthly_total',
             'category.lifetime_cash_in_total as lifetime_cash_in_total',
             'category.lifetime_cash_out_total as lifetime_cash_out_total',
             'category.lifetime_total as lifetime_total',
@@ -33,17 +33,32 @@ class Category extends BaseModel implements CategoryContract {
     }
 
     protected function addFilters ($query, $filters) {
-        $equalFilter = [
-            'id' => 'category.id',
-            'id_user' => 'category.id_user',
-            'name'=> 'category.name'
-        ];
-        $likeFilter = [
-            'name'
+        $availableFilter = [
+            'id' => [
+                'column' => 'category.id',
+                'condition' => '='
+            ],
+            'id_user' => [
+                'column' => 'category.id_user',
+                'condition' => '='
+            ],
+            'name' => [
+                'column' => 'category.name',
+                'condition' => '='
+            ],
+            'type' => [
+                'column' => 'category.type',
+                'condition' => '='
+            ],
+            'q' => [
+                'column' => ['name'],
+                'condition' => 'like',
+                'prefixValue' => '%',
+                'postfixValue' => '%'
+            ]
         ];
         
-        $query = $this->addEqualFilter($query, $filters, $equalFilter);
-        $query = $this->addLikeFilter($query, $filters, $likeFilter);
+        $query = $this->addCustomFilter($query, $filters, $availableFilter);
         $query->whereNull('deleted_at');
 
         return $query;
