@@ -2,6 +2,7 @@
 namespace Service\Me;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Illuminate\Database\Capsule\Manager as DB;
 use Engine\Internal\Delivery;
 use Repository\Contract\TransactionContract;
 use Repository\Contract\UserContract;
@@ -35,20 +36,29 @@ class MeTransactionService {
 			return $this->delivery;
 		}
 
-		$newTransactionId = $transactionRepository->create($payload);
-		$newTransaction = $transactionRepository->findOne(['id' => $newTransactionId]);
-		
-		$walletAction = new MeWalletService($this->request, $this->delivery);
-		$walletAction->updateReport($user, $payload['id_wallet'], $userRepository, $walletRepository, $transactionRepository);
-		
-		$categoryAction = new MeCategoryService($this->request, $this->delivery);
-		$categoryAction->updateReport($user, $payload['id_category'], $userRepository, $categoryRepository, $transactionRepository);
+		try {
+			DB::beginTransaction();
+			
+			$newTransactionId = $transactionRepository->create($payload);
+			$newTransaction = $transactionRepository->findOne(['id' => $newTransactionId]);
+			
+			$walletAction = new MeWalletService($this->request, $this->delivery);
+			$walletAction->updateReport($user, $payload['id_wallet'], $userRepository, $walletRepository, $transactionRepository);
+			
+			$categoryAction = new MeCategoryService($this->request, $this->delivery);
+			$categoryAction->updateReport($user, $payload['id_category'], $userRepository, $categoryRepository, $transactionRepository);
 
-		/* $meAction = new MeService($this->request, $this->delivery);
-		$meAction->updateReport($user, $userRepository, $transactionRepository); */
+			/* $meAction = new MeService($this->request, $this->delivery);
+			$meAction->updateReport($user, $userRepository, $transactionRepository); */
 
-		$this->delivery->data = $newTransaction;
-		$this->delivery->success = true;
+			$this->delivery->data = $newTransaction;
+			$this->delivery->success = true;
+			
+			DB::commit();
+		} catch (\Exception $e) {
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
 		return $this->delivery;
 	}
 
@@ -62,16 +72,26 @@ class MeTransactionService {
 			'id' => $transactionId,
 			'id_user' => $user->id
 		];
-		$action = $transactionRepository->modify($filterAction, $payload);
-		$transaction = $transactionRepository->findOne($filterAction);
 
-		$walletAction = new MeWalletService($this->request, $this->delivery);
-		$walletAction->updateReport($user, $transaction->id_wallet, $userRepository, $walletRepository, $transactionRepository);
+		try {
+			DB::beginTransaction();
 
-		$categoryAction = new MeCategoryService($this->request, $this->delivery);
-		$categoryAction->updateReport($user, $transaction->id_category, $userRepository, $categoryRepository, $transactionRepository);
+			$action = $transactionRepository->modify($filterAction, $payload);
+			$transaction = $transactionRepository->findOne($filterAction);
 
-		$this->delivery->data = $transaction;
+			$walletAction = new MeWalletService($this->request, $this->delivery);
+			$walletAction->updateReport($user, $transaction->id_wallet, $userRepository, $walletRepository, $transactionRepository);
+
+			$categoryAction = new MeCategoryService($this->request, $this->delivery);
+			$categoryAction->updateReport($user, $transaction->id_category, $userRepository, $categoryRepository, $transactionRepository);
+
+			$this->delivery->data = $transaction;
+			
+			DB::commit();
+		} catch (\Exception $e) {
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
 		return $this->delivery;
 	}
 }

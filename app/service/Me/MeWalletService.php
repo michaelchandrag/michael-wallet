@@ -2,6 +2,7 @@
 namespace Service\Me;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Illuminate\Database\Capsule\Manager as DB;
 use Engine\Internal\Delivery;
 use Repository\Contract\WalletContract;
 use Repository\Contract\UserContract;
@@ -34,10 +35,20 @@ class MeWalletService {
 			return $this->delivery;
 		}
 
-		$newWalletId = $walletRepository->create($payload);
-		$newWallet = $walletRepository->findOne(['id' => $newWalletId]);
-		$this->delivery->data = $newWallet;
-		$this->delivery->success = true;
+		try {
+			DB::beginTransaction();
+
+			$newWalletId = $walletRepository->create($payload);
+			$newWallet = $walletRepository->findOne(['id' => $newWalletId]);	
+			$this->delivery->data = $newWallet;
+			$this->delivery->success = true;
+
+			DB::commit();
+		} catch (\Exception $e) {
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
+
 		return $this->delivery;
 	}
 
@@ -51,10 +62,20 @@ class MeWalletService {
 			'id' => $walletId,
 			'id_user' => $user->id
 		];
-		$action = $walletRepository->modify($filterAction, $payload);
-		$wallet = $walletRepository->findOne($filterAction);
 
-		$this->delivery->data = $wallet;
+		try {
+			DB::beginTransaction();
+	
+			$action = $walletRepository->modify($filterAction, $payload);
+			$wallet = $walletRepository->findOne($filterAction);
+
+			$this->delivery->data = $wallet;		
+			
+			DB::commit();
+		} catch (\Exception $e) {
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
 		return $this->delivery;
 	}
 
@@ -69,7 +90,7 @@ class MeWalletService {
 			'id_wallet' => $walletId,
 			'id_user' => $user->id
 		];
-
+		
 		$lifetimeReport = $transactionRepository->fetchByCategoryType($filters);
 		if (isset($lifetimeReport['cash_in'])) {
 			$payload['lifetime_cash_in_total'] = $lifetimeReport['cash_in'];

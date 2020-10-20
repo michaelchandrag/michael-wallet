@@ -81,5 +81,5 @@ ALTER TABLE `wallet` ADD COLUMN `monthly_cash_out_total` INT NULL DEFAULT 0;
 ALTER TABLE `wallet` ADD COLUMN `monthly_cash_total` INT NULL DEFAULT 0;
 ALTER TABLE `category` ADD COLUMN `monthly_cash_in_total` INT NULL DEFAULT 0;
 ALTER TABLE `category` ADD COLUMN `monthly_cash_out_total` INT NULL DEFAULT 0;
-ALTER TABLE `category` ADD COLUMN `monthly_total` INT NULL DEFAULT 0;
+ALTER TABLE `category` ADD COLUMN `monthly_cash_total` INT NULL DEFAULT 0;
 ALTER TABLE `transaction` ADD COLUMN `transaction_at` DATETIME NULL DEFAULT NOW();

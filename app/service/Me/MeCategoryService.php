@@ -2,6 +2,7 @@
 namespace Service\Me;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Illuminate\Database\Capsule\Manager as DB;
 use Engine\Internal\Delivery;
 use Repository\Contract\CategoryContract;
 use Repository\Contract\UserContract;
@@ -34,10 +35,21 @@ class MeCategoryService {
 			return $this->delivery;
 		}
 
-		$newCategoryId = $categoryRepository->create($payload);
-		$newCategory = $categoryRepository->findOne(['id' => $newCategoryId]);
-		$this->delivery->data = $newCategory;
-		$this->delivery->success = true;
+		try {
+			DB::beginTransaction();
+			
+			$newCategoryId = $categoryRepository->create($payload);
+			$newCategory = $categoryRepository->findOne(['id' => $newCategoryId]);
+			$this->delivery->data = $newCategory;
+			$this->delivery->success = true;
+			
+			DB::commit();
+		} catch (\Exception $e) {
+			dump($e->getMessage());
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
+
 		return $this->delivery;
 	}
 
@@ -51,10 +63,20 @@ class MeCategoryService {
 			'id' => $categoryId,
 			'id_user' => $user->id
 		];
-		$action = $categoryRepository->modify($filterAction, $payload);
-		$category = $categoryRepository->findOne($filterAction);
 
-		$this->delivery->data = $category;
+		try {
+			DB::beginTransaction();
+			
+			$action = $categoryRepository->modify($filterAction, $payload);
+			$category = $categoryRepository->findOne($filterAction);
+
+			$this->delivery->data = $category;
+			
+			DB::commit();
+		} catch (\Exception $e) {
+			$this->delivery->addError(500, 'Internal Server Error');
+			DB::rollBack();
+		}
 		return $this->delivery;
 	}
 
