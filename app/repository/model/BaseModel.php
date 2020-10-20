@@ -100,7 +100,7 @@ abstract class BaseModel extends Model {
                             if ($idx == 0) {
                                 $queryLevel->where($column, $argValue['condition'], $value);
                             } else {
-                                $queryLevel->where($column, $argValue['condition'], $value);
+                                $queryLevel->orWhere($column, $argValue['condition'], $value);
                             }
                         }
                     });

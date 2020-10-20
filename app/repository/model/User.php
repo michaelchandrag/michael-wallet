@@ -31,18 +31,32 @@ class User extends BaseModel implements UserContract {
     }
 
     protected function addFilters ($query, $filters) {
-        $equalFilter = [
-            'id' => 'user.id',
-            'email' => 'user.email',
-            'phone_number' => 'user.phone_number',
-            'username' => ['user.email', 'user.phone_number']
-        ];
-        $likeFilter = [
-            'q' => ['user.name']
+        $availableFilter = [
+            'id' => [
+                'column' => 'user.id',
+                'condition' => '='
+            ],
+            'email' => [
+                'column' => 'user.email',
+                'condition' => '='
+            ],
+            'phone_number' => [
+                'column' => 'user.phone_number',
+                'condition' => '='
+            ],
+            'username' => [
+                'column' => ['user.phone_number', 'user.email'],
+                'condition' => '='
+            ],
+            'q' => [
+                'column' => ['name'],
+                'condition' => 'like',
+                'prefixValue' => '%',
+                'postfixValue' => '%'
+            ]
         ];
 
-        $query = $this->addEqualFilter($query, $filters, $equalFilter);
-        $query = $this->addLikeFilter($query, $filters, $likeFilter);
+        $query = $this->addCustomFilter($query, $filters, $availableFilter);
         $query->whereNull('deleted_at');
 
         return $query;

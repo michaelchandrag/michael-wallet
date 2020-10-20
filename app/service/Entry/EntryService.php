@@ -4,6 +4,7 @@ namespace Service\Entry;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Engine\Internal\Delivery;
 use Repository\Contract\UserContract;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class EntryService {
 
@@ -40,8 +41,8 @@ class EntryService {
 
 	public function login ($data, UserContract $userRepository) {
 		$payload = $data;
-
 		$this->delivery = $this->entryValidator->validateLogin($this->delivery, $payload, $userRepository);
+
 		if ($this->delivery->hasErrors())
 			return $this->delivery;
 
