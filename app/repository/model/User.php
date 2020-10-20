@@ -32,13 +32,13 @@ class User extends BaseModel implements UserContract {
 
     protected function addFilters ($query, $filters) {
         $equalFilter = [
-            'id' => 'id',
-            'email' => 'email',
-            'phone_number' => 'phone_number',
-            'username' => ['email', 'phone_number']
+            'id' => 'user.id',
+            'email' => 'user.email',
+            'phone_number' => 'user.phone_number',
+            'username' => ['user.email', 'user.phone_number']
         ];
         $likeFilter = [
-            'q' => ['name']
+            'q' => ['user.name']
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);

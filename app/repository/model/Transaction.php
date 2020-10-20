@@ -33,10 +33,10 @@ class Transaction extends BaseModel implements TransactionContract {
         $query->join('category', 'category.id', '=', 'transaction.id_category');
 
         $equalFilter = [
-            'transaction.id',
-            'transaction.id_user',
-            'transaction.id_wallet',
-            'transaction.id_category'
+            'id' => 'transaction.id',
+            'id_user' => 'transaction.id_user',
+            'id_wallet' => 'transaction.id_wallet',
+            'id_category' => 'transaction.id_category'
         ];
 
         $query = $this->addEqualFilter($query, $filters, $equalFilter);
@@ -60,15 +60,15 @@ class Transaction extends BaseModel implements TransactionContract {
             'category.type as type',
             DB::raw('SUM(transaction.amount) as total')
         );
-        $query->join('wallet', 'wallet.id', '=', 'transaction.id_wallet');
-        $query->join('category', 'category.id', '=', 'transaction.id_category');
         $query->join('user', 'user.id', '=', 'transaction.id_user');
         $query = $this->addFilters($query, $filters);
         $query->groupBy('category.type');
         $result = [];
-        foreach ($query->get() as $data) {
+        $result = $query->get();
+        foreach ($result as $data) {
             $result[$data->type] = $data->total;
         }
+
         return $result;
     }
 }

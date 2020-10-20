@@ -18,6 +18,9 @@ class Wallet extends BaseModel implements WalletContract {
         $query->select(
             'wallet.id as id',
             'wallet.name as name',
+            'wallet.monthly_cash_in_total as monthly_cash_in_total',
+            'wallet.monthly_cash_out_total as monthly_cash_out_total',
+            'wallet.monthly_cash_total as monthly_cash_total',
             'wallet.lifetime_cash_in_total as lifetime_cash_in_total',
             'wallet.lifetime_cash_out_total as lifetime_cash_out_total',
             'wallet.lifetime_total as lifetime_total',
@@ -30,9 +33,9 @@ class Wallet extends BaseModel implements WalletContract {
 
     protected function addFilters ($query, $filters) {
         $equalFilter = [
-            'id',
-            'id_user',
-            'name'
+            'id' => 'wallet.id',
+            'id_user' => 'wallet.id_user',
+            'name' => 'wallet.name'
         ];
         $likeFilter = [
             'q' => ['name']

@@ -19,6 +19,9 @@ class Category extends BaseModel implements CategoryContract {
             'category.id as id',
             'category.name as name',
             'category.type as type',
+            'category.monthly_cash_in_total as monthly_cash_in_total',
+            'category.monthly_cash_out_total as monthly_cash_out_total',
+            'category.monthly_cash_total as monthly_cash_total',
             'category.lifetime_cash_in_total as lifetime_cash_in_total',
             'category.lifetime_cash_out_total as lifetime_cash_out_total',
             'category.lifetime_total as lifetime_total',
@@ -31,9 +34,9 @@ class Category extends BaseModel implements CategoryContract {
 
     protected function addFilters ($query, $filters) {
         $equalFilter = [
-            'id',
-            'id_user',
-            'name'
+            'id' => 'category.id',
+            'id_user' => 'category.id_user',
+            'name'=> 'category.name'
         ];
         $likeFilter = [
             'name'
