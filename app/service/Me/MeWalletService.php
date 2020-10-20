@@ -66,9 +66,10 @@ class MeWalletService {
 		];
 
 		$filters = [
-			't.id_wallet' => $walletId,
-			't.id_user' => $user->id
+			'id_wallet' => $walletId,
+			'id_user' => $user->id
 		];
+
 		$lifetimeReport = $transactionRepository->fetchByCategoryType($filters);
 		if (isset($lifetimeReport['cash_in'])) {
 			$payload['lifetime_cash_in_total'] = $lifetimeReport['cash_in'];
@@ -76,7 +77,7 @@ class MeWalletService {
 		if (isset($lifetimeReport['cash_out'])) {
 			$payload['lifetime_cash_out_total'] = $lifetimeReport['cash_out'];
 		}
-
+		
 		$payload['lifetime_total'] = $payload['lifetime_cash_in_total'] - $payload['lifetime_cash_out_total'];
 		$this->updateWallet($walletId, $user, $payload, $walletRepository, $userRepository);
 		return true;

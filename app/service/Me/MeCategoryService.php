@@ -64,10 +64,10 @@ class MeCategoryService {
 			'lifetime_cash_out_total' => 0,
 			'lifetime_total' => 0
 		];
-
+		
 		$filters = [
-			't.id_category' => $categoryId,
-			't.id_user' => $user->id
+			'id_category' => $categoryId,
+			'id_user' => $user->id
 		];
 		$lifetimeReport = $transactionRepository->fetchByCategoryType($filters);
 		if (isset($lifetimeReport['cash_in'])) {

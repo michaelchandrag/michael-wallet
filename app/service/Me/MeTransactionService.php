@@ -37,10 +37,10 @@ class MeTransactionService {
 
 		$newTransactionId = $transactionRepository->create($payload);
 		$newTransaction = $transactionRepository->findOne(['id' => $newTransactionId]);
-
+		
 		$walletAction = new MeWalletService($this->request, $this->delivery);
 		$walletAction->updateReport($user, $payload['id_wallet'], $userRepository, $walletRepository, $transactionRepository);
-
+		
 		$categoryAction = new MeCategoryService($this->request, $this->delivery);
 		$categoryAction->updateReport($user, $payload['id_category'], $userRepository, $categoryRepository, $transactionRepository);
 
@@ -64,6 +64,12 @@ class MeTransactionService {
 		];
 		$action = $transactionRepository->modify($filterAction, $payload);
 		$transaction = $transactionRepository->findOne($filterAction);
+
+		$walletAction = new MeWalletService($this->request, $this->delivery);
+		$walletAction->updateReport($user, $transaction->id_wallet, $userRepository, $walletRepository, $transactionRepository);
+
+		$categoryAction = new MeCategoryService($this->request, $this->delivery);
+		$categoryAction->updateReport($user, $transaction->id_category, $userRepository, $categoryRepository, $transactionRepository);
 
 		$this->delivery->data = $transaction;
 		return $this->delivery;
