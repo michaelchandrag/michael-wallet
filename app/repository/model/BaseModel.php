@@ -90,6 +90,29 @@ abstract class BaseModel extends Model {
         return $query;
     }
 
+    protected function addCustomFilter ($query, $filters, $args) {
+        foreach ($args as $argKey => $argValue) {
+            if ($this->isAvailable($filters, $argKey)) {
+                $value = (isset($argValue['prefixValue']) ? $argValue['prefixValue'] : '') . $filters[$argKey] . (isset($argValue['postfixValue']) ? $argValue['postfixValue'] : '');
+                if (is_array($argValue['column'])) {
+                    $query->where(function ($queryLevel) use ($filters, $argKey, $argValue, $value) {
+                        foreach ($argValue['column'] as $idx => $column) {
+                            if ($idx == 0) {
+                                $queryLevel->where($column, $argValue['condition'], $value);
+                            } else {
+                                $queryLevel->where($column, $argValue['condition'], $value);
+                            }
+                        }
+                    });
+                } else {
+                    $query->where($argValue['column'], $argValue['condition'], $value);
+                }
+            }
+        }
+
+        return $query;
+    }
+
     protected function addSort ($query, $filters) {
         // sort_key , sort_value
         $sortKey = 'created_at';
