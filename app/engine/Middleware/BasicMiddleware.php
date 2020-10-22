@@ -19,19 +19,26 @@ class BasicMiddleware
      */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
-    	$headers = $request->getHeader('Authorization');
-        $explode = explode("Bearer ", $headers[0]);
-        $token = $explode[1];
-    	if (!getJWTPayload($token)) {
-    		$delivery = new Delivery;
-    		$delivery->addError(403, 'Authorization token not found');
+        try {
+            $headers = $request->getHeader('Authorization');
+            if (empty($headers)) {
+                throw new \Exception('Authorization token not found');
+            }
+            $explode = explode("Bearer ", $headers[0]);
+            $token = $explode[1];
+            if (!getJWTPayload($token)) {
+                throw new \Exception('Authorization token not found');
+            } else {
+                $response = $handler->handle($request);
+                return $response;   
+            }
+        } catch (\Exception $e) {
+            $delivery = new Delivery;
+            $delivery->addError(403, 'Authorization token not found');
             $delivery->statusCode = 403;
             $response = new \Slim\Psr7\Response();
             $baseController = new BaseController;
-    		return $baseController->deliverJSON($response, $delivery);
-    	} else {
-    		$response = $handler->handle($request);
-	        return $response;	
-    	}
+            return $baseController->deliverJSON($response, $delivery);
+        }
     }
 }
