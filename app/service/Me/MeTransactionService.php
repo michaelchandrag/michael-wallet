@@ -48,8 +48,8 @@ class MeTransactionService {
 			$categoryAction = new MeCategoryService($this->request, $this->delivery);
 			$categoryAction->updateReport($user, $payload['id_category'], $userRepository, $categoryRepository, $transactionRepository);
 
-			/* $meAction = new MeService($this->request, $this->delivery);
-			$meAction->updateReport($user, $userRepository, $transactionRepository); */
+			$meAction = new MeService($this->request, $this->delivery);
+			$meAction->updateReport($user, $userRepository, $transactionRepository);
 
 			$this->delivery->data = $newTransaction;
 			$this->delivery->success = true;

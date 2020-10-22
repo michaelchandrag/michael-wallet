@@ -19,6 +19,7 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
     // me
     $group->group('/me', function (RouteCollectorProxy $groupMe) {
     	$groupMe->get('', 'ApiMeController:GetAction');
+        $groupMe->post('', 'ApiMeController:UpdateAction');
 
         // wallet
         $groupMe->group('/wallet', function (RouteCollectorProxy $groupWallet) {

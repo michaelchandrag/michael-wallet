@@ -23,5 +23,13 @@ class MeController extends BaseController {
 		$result = $service->getMe($user, new User, new Wallet, new Transaction);
 		return $this->deliverJSON($response, $result);
 	}
+
+	public function UpdateAction (Request $request, Response $response, $args) {
+		$user = $this->getUser($request);
+		$data = $request->getParsedBody();
+		$service = new MeService($request, $this->delivery);
+		$result = $service->updateMe($user, $data, new User);
+		return $this->deliverJSON($response, $result);
+	}
 	
 }
