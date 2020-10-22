@@ -26,11 +26,7 @@ class MeWalletController extends BaseController {
 	public function CreateWalletAction (Request $request, Response $response, $args) {
 		$user = $this->getUser($request);
 		$data = $request->getParsedBody();
-		$data = [
-			'name' => $data['name'],
-			'description' => $data['description'],
-			'id_user' => $user->id
-		];
+		$data['id_user'] = $user->id;
 		$service = new MeWalletService($request, $this->delivery);
 		$result = $service->createWallet($data, $user, new Wallet, new User);
 		return $this->deliverJSON($response, $result);

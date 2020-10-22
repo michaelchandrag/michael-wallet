@@ -26,12 +26,7 @@ class MeCategoryController extends BaseController {
 	public function CreateCategoryAction (Request $request, Response $response, $args) {
 		$user = $this->getUser($request);
 		$data = $request->getParsedBody();
-		$data = [
-			'name' => $data['name'],
-			'description' => $data['description'],
-			'type' => $data['type'],
-			'id_user' => $user->id
-		];
+		$data['id_user'] = $user->id;
 		$service = new MeCategoryService($request, $this->delivery);
 		$result = $service->createCategory($data, $user, new Category, new User);
 		return $this->deliverJSON($response, $result);

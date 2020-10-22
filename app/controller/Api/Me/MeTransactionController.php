@@ -28,13 +28,7 @@ class MeTransactionController extends BaseController {
 	public function CreateTransactionAction (Request $request, Response $response, $args) {
 		$user = $this->getUser($request);
 		$data = $request->getParsedBody();
-		$data = [
-			'id_wallet' => $data['id_wallet'],
-			'id_category' => $data['id_category'],
-			'amount' => $data['amount'],
-			'description' => $data['description'],
- 			'id_user' => $user->id
-		];
+		$data['id_user'] = $user->id;
 		$service = new MeTransactionService($request, $this->delivery);
 		$result = $service->createTransaction($data, $user, new Transaction, new User, new Wallet, new Category);
 		return $this->deliverJSON($response, $result);
